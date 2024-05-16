@@ -1,7 +1,7 @@
-# sakhi-context-service
+# sakhi-utility-service
 
 
-[Jugalbandi API](https://api.jugalbandi.ai/docs) is a system of APIs that allows users to build Q&A style applications on their private and public datasets. The system creates Open API 3.0 specification endpoints using FastAPI.
+sakhi-utility-service is a service used to support the content service in the Sakhi platform. The service is used to extract context information of chosen attributes from an user's query and to achieve translation of text/audio from one language to another language in text/audio format. The service is built using FastAPI and OpenAI API.
 
 
 # 🔧 1. Installation
@@ -11,7 +11,7 @@ To use the code, you need to follow these steps:
 1. Clone the repository from GitHub: 
     
     ```bash
-    git clone https://github.com/DJP-Digital-Jaaduii-Pitara/sakhi-utility-service.git
+    git clone https://github.com/Sunbird-AIAssistant/sakhi-utility-service.git
     ```
 
 2. The code requires **Python 3.7 or higher** and some additional python packages. To install these packages, run the following command in your terminal:
@@ -20,24 +20,34 @@ To use the code, you need to follow these steps:
     pip install requirements.txt
     ```
 
-3. You will need a OCI account to store the audio file for response.
+3. You will need a Cloud Storage account to store the audio file of translated response.
 
-4. create another file **.env** which will hold the development credentials and add the following variables. Update the azure openai details, OCI object storage details and bhashini endpoint URL and API Key.
+4. create another file **.env** which will hold the development credentials and add the following variables. Update the LLM details, Cloud object storage details and Translator details.
 
     ```bash
-    OPENAI_API_VERSION=<AZURE_OPENAI_API_VERSION>
-    OPENAI_API_BASE=<AZURE_OPENAI_BASE_URL>
-    OPENAI_API_TYPE=azure 
-    GPT_MODEL=<AZURE_OPENAI_MODEL_NAME>
-    OPENAI_API_KEY=<your_openai_key>
+    # application environment variables
     LOG_LEVEL=<log_level>  # INFO, DEBUG, ERROR
+    CONFIG_INI_PATH=<config_ini_path> # config.ini
+   
+    # LLM environment variables
+    LLM_TYPE=<llm_type> # azure, openai, ollama 
+    GPT_MODEL=<llm_model_name> # gpt-4
+    OPENAI_API_KEY=<your_openai_key>
+   
+    # Translator environment variables
+    TRANSLATION_TYPE=<translation_type> # bhashini, google, dhruva
     BHASHINI_ENDPOINT_URL=<your_bhashini_endpoint_url>
     BHASHINI_API_KEY=<your_bhashini_api_key>
-    OCI_ENDPOINT_URL=<oracle_bucket_name>
-    OCI_REGION_NAME=<oracle_region_name>
-    OCI_BUCKET_NAME=<oracle_bucket_name>
-    OCI_SECRET_ACCESS_KEY=<oracle_secret_access_key>
-    OCI_ACCESS_KEY_ID=<oracle_access_key_id>
+   
+    # Cloud Storage environment variables
+    BUCKET_TYPE=<cloud_storage_type> # oci, aws, gcp
+    BUCKET_ENDPOINT_URL=<cloud_storage_endpoint_url>
+    BUCKET_REGION_NAME=<cloud_storage_region_name>
+    BUCKET_NAME=<cloud_storage_bucket_name>
+    BUCKET_SECRET_ACCESS_KEY=<cloud_storage_secret_access_key>
+    BUCKET_ACCESS_KEY_ID=<cloud_storage_access_key_id>
+    
+    # Telemetry environment variables
     TELEMETRY_ENDPOINT_URL=<TELEMETRY_ENDPOINT_URL> 
     TELEMETRY_LOG_ENABLED=<TELEMETRY_LOG_ENABLED> 
     ```
@@ -198,28 +208,28 @@ $ cd sakhi-utility-service
 ```
 ### Build Docker Image of the repo: 
 ```text
-$ sudo docker build -t sakhiutilityimage .
+$ sudo docker build -t sakhi-utility-image .
 ```
 ### Create Container: 
 ```text
 $ sudo docker run -d -p 8000:8000 --name sakhi-utility-service \
--e OPENAI_API_VERSION=$AZURE_OPENAI_API_VERSION 
--e OPENAI_API_BASE=$AZURE_OPENAI_BASE_URL
--e OPENAI_API_TYPE=azure 
--e GPT_MODEL=$AZURE_OPENAI_MODEL_NAME
+-e LLM_TYPE=$LLM_TYPE \
+-e GPT_MODEL=$GPT_MODEL
 -e OPENAI_API_KEY=$OPENAI_API_KEY \
 -e LOG_LEVEL=INFO  \
+-e CONFIG_INI_PATH=config.ini \
+-e TRANSLATION_TYPE=$TRANSLATION_TYPE \
 -e BHASHINI_ENDPOINT_URL=$BHASHINI_ENDPOINT_URL \
 -e BHASHINI_API_KEY=$BHASHINI_API_KEY \
--e OCI_ENDPOINT_URL=$OCI_ENDPOINT_URL \
--e OCI_REGION_NAME=$OCI_REGION_NAME \
--e DISABLE_NEST_ASYNCIO=True \
--e OCI_BUCKET_NAME=$OCI_BUCKET_NAME \
--e OCI_SECRET_ACCESS_KEY=$OCI_SECRET_ACCESS_KEY \
--e OCI_ACCESS_KEY_ID=$OCI_ACCESS_KEY_ID \
+-e BUCKET_TYPE=$BUCKET_TYPE \
+-e BUCKET_ENDPOINT_URL=$BUCKET_ENDPOINT_URL \
+-e BUCKET_REGION_NAME=$BUCKET_REGION_NAME \
+-e BUCKET_NAME=$BUCKET_NAME \
+-e BUCKET_SECRET_ACCESS_KEY=$BUCKET_SECRET_ACCESS_KEY \
+-e BUCKET_ACCESS_KEY_ID=$BUCKET_ACCESS_KEY_ID \
 -e TELEMETRY_ENDPOINT_URL=$TELEMETRY_ENDPOINT_URL \
 -e TELEMETRY_LOG_ENABLED=$TELEMETRY_LOG_ENABLED \
-sakhiutilityimage
+sakhi-utility-image
 ```
 
 ---
@@ -234,7 +244,6 @@ sakhiutilityimage
 | database.docs_min_score         | Minimum score of the documents based on which filtration happens on retrieved documents        | 0.4                                  |
 | lang_code.supported_lang_codes  | Supported languages by the service                                                             | en,bn,gu,hi,kn,ml,mr,or,pa,ta,te     |
 | min_words.length | Minimum length of words in user's query for which context extraction get enabled by Gen AI                    | 6                                    |
-| llm.gpt_model                   | Gen AI GPT Model value                                                                         |                                      |
 | telemetry.telemetry_log_enabled | Flag to enable or disable telemetry events logging to Sunbird Telemetry service                | true                                 |
 | telemetry.environment           | service environment from where telemetry is generated from, in telemetry service               | dev                                  |
 | telemetry.service_id            | service identifier to be passed to Sunbird telemetry service                                   |                                      |
