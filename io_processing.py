@@ -1,14 +1,14 @@
 from logger import logger
-from translator import *
 import time
+from env_manager import translate_class as translator
 
 
 def transcribe_audio_to_reg_eng_text(file_url, input_language):
     error_message = None
     try:
-        regional_text = audio_input_to_text(file_url, input_language)
+        regional_text = translator.speech_to_text(file_url, input_language)
         try:
-            english_text = indic_translation(text=regional_text, source=input_language, destination='en')
+            english_text = translator.translate_text(text=regional_text, source=input_language, destination='en')
         except Exception as e:
             error_message = "Indic translation to English failed"
             logger.error(f"Exception occurred: {e}", exc_info=True)
@@ -24,7 +24,7 @@ def transcribe_audio_to_reg_eng_text(file_url, input_language):
 def translate_text_to_english(regional_text, input_language):
     error_message = None
     try:
-        english_text = indic_translation(text=regional_text, source=input_language, destination='en')
+        english_text = translator.translate_text(text=regional_text, source=input_language, destination='en')
     except Exception as e:
         error_message = "Indic translation to English failed"
         english_text = None
@@ -35,7 +35,7 @@ def translate_text_to_english(regional_text, input_language):
 def translate_text(input_text, input_language, output_language):
     error_message = None
     try:
-        regional_text = indic_translation(text=input_text, source=input_language, destination=output_language)
+        regional_text = translator.translate_text(text=input_text, source=input_language, destination=output_language)
     except Exception as ex:
         print(type(ex))  # the exception type
         print(ex.args)  # arguments stored in .args
@@ -48,7 +48,7 @@ def translate_text(input_text, input_language, output_language):
 
 def convert_text_to_audio(message, input_language):
     error_message = None
-    decoded_audio_content = text_to_speech(language=input_language, text=message)
+    decoded_audio_content = translator.text_to_speech(language=input_language, text=message)
     if decoded_audio_content is not None:
         logger.info("Creating output MP3 file")
         time_stamp = time.strftime("%Y%m%d-%H%M%S")
