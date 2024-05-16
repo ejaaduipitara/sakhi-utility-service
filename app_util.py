@@ -11,6 +11,7 @@ from typing import (
 from langchain.schema.messages import BaseMessage
 from langchain.adapters.openai import convert_dict_to_message
 
+
 def is_base64(base64_string):
     try:
         base64.b64decode(base64_string)
@@ -30,7 +31,6 @@ def is_url(string):
 
 def generate_temp_filename(ext, prefix="temp"):
     return f"{prefix}_{uuid.uuid4()}.{ext}"
-
 
 
 def convert_chat_messages(messages: Sequence[Dict[str, Any]]) -> List[BaseMessage]:

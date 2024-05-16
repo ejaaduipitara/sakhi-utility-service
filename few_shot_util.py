@@ -10,7 +10,6 @@ from env_manager import ai_class
 temperature = float(get_config_value("llm", "temperature"))
 chatClient = ai_class.get_client(temperature=temperature)
 
-gpt_model = get_config_value("llm", "gpt_model", None)
 instructions = get_config_value('few_shot_config', 'instructions', None)
 examples = json.loads(get_config_value('few_shot_config', 'examples', None))
 
@@ -57,8 +56,7 @@ def invokeLLM(question):
     return response
 
 
-
 def call_chat_model(messages: List[dict]) -> str:
-    converted_messsages = convert_chat_messages(messages)
-    response = chatClient.invoke(input=converted_messsages)
+    converted_messages = convert_chat_messages(messages)
+    response = chatClient.invoke(input=converted_messages)
     return response.content
