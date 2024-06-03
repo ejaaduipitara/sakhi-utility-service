@@ -4,6 +4,7 @@ from typing import List
 import outlines
 
 from env_manager import llm_class
+from logger import logger
 from utils import get_from_env_or_config, convert_chat_messages
 
 temperature = float(get_from_env_or_config("llm", "temperature"))
@@ -43,7 +44,7 @@ prompt = few_shots(instructions, examples)
 
 def invokeLLM(question):
     system_rules = prompt.replace("user_question", question)
-    print("system_rules::: ", system_rules)
+    logger.debug("system_rules::: ", system_rules)
 
     response = call_chat_model(
         messages=[
@@ -51,7 +52,7 @@ def invokeLLM(question):
             {"role": "user", "content": question}
         ]
     )
-    print("response::: ", response)
+    logger.debug("response::: ", response)
     return response
 
 
