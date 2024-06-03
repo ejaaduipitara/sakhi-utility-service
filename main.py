@@ -51,10 +51,7 @@ class TranslationResponse(BaseModel):
     translation: OutputResponse = None
 
 
-
 language_code_list = get_from_env_or_config('lang_code', 'supported_lang_codes', None).split(",")
-
-
 
 # Telemetry API logs middleware
 app.add_middleware(TelemetryMiddleware)
