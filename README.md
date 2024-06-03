@@ -1,6 +1,7 @@
 # sakhi-utility-service
 
 
+
 sakhi-utility-service is a service used to support the content service in the Sakhi platform. The service is used to extract context information of chosen attributes from an user's query and to achieve translation of text/audio from one language to another language in text/audio format. The service is built using FastAPI and OpenAI API.
 
 
