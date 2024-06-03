@@ -2,8 +2,7 @@ import time
 import json
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-
-from config_util import get_config_value
+from utils import get_from_env_or_config
 from telemetry_logger import TelemetryLogger
 from starlette.types import Message
 from logger import logger
@@ -22,7 +21,7 @@ async def get_body(request: Request) -> bytes:
 
 
 telemetryLogger = TelemetryLogger()
-telemetry_log_enabled = get_config_value('telemetry', 'telemetry_log_enabled', None).lower() == "true"
+telemetry_log_enabled = get_from_env_or_config('telemetry', 'telemetry_log_enabled', None).lower() == "true"
 
 
 class TelemetryMiddleware(BaseHTTPMiddleware):
