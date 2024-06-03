@@ -3,18 +3,19 @@ import uuid
 
 import requests
 
-from config_util import get_config_value
-from logger import logger
 
-telemetryURL = get_config_value('telemetry', 'TELEMETRY_ENDPOINT_URL', None)
-ENV_NAME = get_config_value('telemetry', 'environment', None)
-TELEMETRY_LOG_ENABLED = get_config_value('telemetry', 'telemetry_log_enabled', None).lower() == "true"
-telemetry_id = get_config_value('telemetry', 'service_id', None)
-telemetry_ver = get_config_value('telemetry', 'service_ver', None)
-actor_id = get_config_value('telemetry', 'actor_id', None)
-channel = get_config_value('telemetry', 'channel', None)
-pdata_id = get_config_value('telemetry', 'pdata_id', None)
-events_threshold = get_config_value('telemetry', 'events_threshold', None)
+from logger import logger
+from utils import get_from_env_or_config
+
+telemetryURL = get_from_env_or_config('telemetry', 'TELEMETRY_ENDPOINT_URL', None)
+ENV_NAME = get_from_env_or_config('telemetry', 'environment', None)
+TELEMETRY_LOG_ENABLED = get_from_env_or_config('telemetry', 'telemetry_log_enabled', None).lower() == "true"
+telemetry_id = get_from_env_or_config('telemetry', 'service_id', None)
+telemetry_ver = get_from_env_or_config('telemetry', 'service_ver', None)
+actor_id = get_from_env_or_config('telemetry', 'actor_id', None)
+channel = get_from_env_or_config('telemetry', 'channel', None)
+pdata_id = get_from_env_or_config('telemetry', 'pdata_id', None)
+events_threshold = get_from_env_or_config('telemetry', 'events_threshold', None)
 
 class TelemetryLogger:
     """

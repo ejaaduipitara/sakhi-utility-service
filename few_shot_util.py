@@ -3,15 +3,14 @@ from typing import List
 
 import outlines
 
-from app_util import convert_chat_messages
-from config_util import get_config_value
-from env_manager import ai_class
+from env_manager import llm_class
+from utils import get_from_env_or_config, convert_chat_messages
 
-temperature = float(get_config_value("llm", "temperature"))
-chatClient = ai_class.get_client(temperature=temperature)
+temperature = float(get_from_env_or_config("llm", "temperature"))
+chatClient = llm_class.get_client(temperature=temperature)
 
-instructions = get_config_value('few_shot_config', 'instructions', None)
-examples = json.loads(get_config_value('few_shot_config', 'examples', None))
+instructions = get_from_env_or_config('few_shot_config', 'instructions', None)
+examples = json.loads(get_from_env_or_config('few_shot_config', 'examples', None))
 
 
 @outlines.prompt

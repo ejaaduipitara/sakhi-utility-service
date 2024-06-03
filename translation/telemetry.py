@@ -1,7 +1,7 @@
 from telemetry_logger import TelemetryLogger
 
-
 telemetryLogger = TelemetryLogger()
+
 
 def log_success_telemetry_event(url, method, payload, process_time, status_code):
     event: dict = {
@@ -26,4 +26,3 @@ def log_failed_telemetry_event(url, method, payload, process_time, status_code, 
     error = error.replace("'", "")
     event = telemetryLogger.prepare_log_event(eventInput=event, etype="api_call", elevel="ERROR", message=error)
     telemetryLogger.add_event(event)
-
