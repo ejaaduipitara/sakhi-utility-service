@@ -1,12 +1,15 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 
-from cloud_storage_oci import *
-from config_util import get_config_value
+from env_manager import storage_class
 from few_shot_util import *
 from io_processing import *
 from logger import logger
 from telemetry_middleware import TelemetryMiddleware
+from utils import is_base64, is_url
 
 app = FastAPI()
 
@@ -48,10 +51,7 @@ class TranslationResponse(BaseModel):
     translation: OutputResponse = None
 
 
-
-language_code_list = get_config_value('lang_code', 'supported_lang_codes', None).split(",")
-
-
+language_code_list = get_from_env_or_config('lang_code', 'supported_lang_codes', None).split(",")
 
 # Telemetry API logs middleware
 app.add_middleware(TelemetryMiddleware)
@@ -88,7 +88,7 @@ async def query_context_extraction(request: ContextRequest):
     source_language = None
     updated_answer = None
 
-    min_words_length = get_config_value('min_words', 'length', None)
+    min_words_length = get_from_env_or_config('min_words', 'length', None)
     logger.info({"text": request.text, "audio": request.audio, "source_language": request.language})
     if request.text is not None:
         text = request.text.strip()
@@ -131,10 +131,8 @@ async def query_context_extraction(request: ContextRequest):
 
         logger.info({"query": eng_text})
         try:
-            response = invokeLLM(eng_text)
-            response = "{" + response["content"] + "}"
-            json_resp = json.loads(response)
-            answer: dict = json_resp["answer"]
+            response = json.loads("{" + invokeLLM(eng_text) + "}")
+            answer: dict = response["answer"]
             logger.info("answer:: ", answer)
         except Exception as ex:
             answer = None
@@ -229,19 +227,19 @@ async def translator(request: TranslationRequest) -> TranslationResponse:
                 raise HTTPException(status_code=422, detail="Invalid audio input!")
             logger.info("TRANSLATE AUDIO TO TEXT OF SAME LANGUAGE::: ")
             logger.info({"text": text, "source_language": source_language})
-            trans_text = audio_input_to_text(audio, source_language)
+            trans_text = translator.speech_to_text(audio, source_language)
         elif target_format == "text" and audio is not None and audio != "" and source_language != target_language:
             if not is_url(audio) and not is_base64(audio):
                 raise HTTPException(status_code=422, detail="Invalid audio input!")
             logger.info("TRANSLATE AUDIO TO TEXT OF OTHER LANGUAGE::: ")
             logger.info({"text": text, "source_language": source_language, "target_language": target_language})
-            trans_text_same_lang = audio_input_to_text(audio, source_language)
+            trans_text_same_lang = translator.speech_to_text(audio, source_language)
             trans_text, error_message = translate_text(trans_text_same_lang, source_language, target_language)
         elif target_format == "audio" and audio is not None and audio != "":
             if not is_url(audio) and not is_base64(audio):
                 raise HTTPException(status_code=422, detail="Invalid audio input!")
             logger.info("TRANSLATE AUDIO TO AUDIO OF OTHER LANGUAGE::: ")
-            src_trans_text = audio_input_to_text(audio, source_language)
+            src_trans_text = translator.speech_to_text(audio, source_language)
             trans_text, error_message = translate_text(src_trans_text, source_language, target_language)
             trans_audio = convert_to_audio(trans_text, target_language)
 
@@ -256,9 +254,10 @@ async def translator(request: TranslationRequest) -> TranslationResponse:
 
 def convert_to_audio(text, target_language):
     output_file, error_message = convert_text_to_audio(text, target_language)
+    logger.debug("Output File:: ", output_file.name)
     if output_file is not None:
-        upload_file_object(output_file.name)
-        trans_audio_url, error_message = give_public_url(output_file.name)
+        storage_class.upload_to_storage(output_file.name)
+        trans_audio_url, error_message = storage_class.generate_public_url(output_file.name)
         logger.debug("Audio Output URL:: ", trans_audio_url)
         output_file.close()
         os.remove(output_file.name)
