@@ -241,7 +241,6 @@ sakhi-utility-image
 |:--------------------------------|------------------------------------------------------------------------------------------------|--------------------------------------|
 | few_shot_config.instructions    | System prompt for GEN AI to perform the context recognition for user's query                   |                                      |
 | few_shot_config.examples        | Context examples inserted to System prompt for GEN AI to perform few shot learning             |                                      |
-| database.docs_min_score         | Minimum score of the documents based on which filtration happens on retrieved documents        | 0.4                                  |
 | lang_code.supported_lang_codes  | Supported languages by the service                                                             | en,bn,gu,hi,kn,ml,mr,or,pa,ta,te     |
 | min_words.length | Minimum length of words in user's query for which context extraction get enabled by Gen AI                    | 6                                    |
 | telemetry.telemetry_log_enabled | Flag to enable or disable telemetry events logging to Sunbird Telemetry service                | true                                 |
