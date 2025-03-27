@@ -14,6 +14,7 @@ class DhruvaTranslationClass(BaseTranslationClass):
 
     def __init__(self) -> None:
         self.asr_mapping = {
+            "as": "ai4bharat/conformer-multilingual-indo_aryan-gpu--t4",
             "bn": "ai4bharat/conformer-multilingual-indo-aryan--gpu-t4",
             "en": "ai4bharat/whisper--gpu-t4",
             "gu": "ai4bharat/conformer-multilingual-indo-aryan--gpu-t4",
