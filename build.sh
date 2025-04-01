@@ -3,7 +3,7 @@
 set -eo pipefail
 
 build_tag=$1
-name=sakhi-utility-service
+name=sakhi_utility_api_service
 node=$2
 org=$3
 
