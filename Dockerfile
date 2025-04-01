@@ -3,6 +3,7 @@ FROM continuumio/anaconda3:2023.03-1
 WORKDIR /root
 RUN apt-get update && apt-get install -y curl file
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
 ENV PATH=$PATH:/root/.cargo/bin \
     OPENAI_API_KEY=$OPENAI_API_KEY \
     LOG_LEVEL=$LOG_LEVEL  \
@@ -16,10 +17,20 @@ ENV PATH=$PATH:/root/.cargo/bin \
     SERVICE_ENVIRONMENT=$SERVICE_ENVIRONMENT \
     TELEMETRY_ENDPOINT_URL=$TELEMETRY_ENDPOINT_URL \
     TELEMETRY_LOG_ENABLED=$TELEMETRY_LOG_ENABLED
+
 RUN apt-get update && apt install build-essential --fix-missing -y
 RUN apt-get install ffmpeg -y
+
+# Clone and install NeMo
+RUN git clone https://github.com/AI4Bharat/NeMo.git && \
+    cd NeMo && \
+    git checkout nemo-v2 && \
+    bash reinstall.sh
+
 COPY requirements.txt /root/
 RUN pip3 install -r requirements.txt
+
 COPY main.py cloud_storage_oci.py config.ini few_shot_util.py io_processing.py translator.py audio_verifier_util.py logger.py script.sh telemetry_logger.py telemetry_middleware.py config_util.py /root/
+
 EXPOSE 8000
 ENTRYPOINT ["bash","script.sh"]
